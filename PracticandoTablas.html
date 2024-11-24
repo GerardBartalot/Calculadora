@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Práctica de Tablas de Multiplicar</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 flex items-center justify-center h-screen">
+    <div class="bg-white p-8 rounded shadow-md text-center w-96">
+        <h1 class="text-2xl font-bold mb-4">Práctica de Tablas de Multiplicar</h1>
+        <p id="question" class="text-xl mb-4"></p>
+        <input type="number" id="answer" class="border rounded px-3 py-2 mb-4 w-full">
+        <button onclick="checkAnswer()" class="bg-blue-500 text-white px-4 py-2 rounded">Comprobar</button>
+        <p id="result" class="mt-4 hidden"></p>
+        <p id="score" class="mt-4">Puntuación: <span id="points">0</span></p>
+        <p id="timer" class="mt-4">Tiempo restante: <span id="time">10</span>s</p>
+        <div class="mt-6">
+            <p>Aciertos: <span id="correct-count">0</span></p>
+            <p>Fallos: <span id="incorrect-count">0</span></p>
+        </div>
+        <p id="final-score" class="mt-6 hidden"></p>
+    </div>
+
+    <script>
+        let num1, num2, correctCount = 0, incorrectCount = 0, questionCount = 0, score = 0;
+        let timerInterval, answerTimeout;
+
+        function generateQuestion() {
+            num1 = Math.floor(Math.random() * 10) + 1;
+            num2 = Math.floor(Math.random() * 10) + 1;
+            document.getElementById('question').innerText = `${num1} x ${num2} = ?`;
+            document.getElementById('answer').value = '';
+            document.getElementById('answer').disabled = false;
+            document.getElementById('result').innerText = '';
+            document.getElementById('result').classList.add('hidden');
+            document.getElementById('points').innerText = '1000';
+            document.getElementById('time').innerText = '10';
+            startTimer();
+        }
+
+        function startTimer() {
+            let timeLeft = 10;
+            score = 1000;
+            document.getElementById('timer').innerText = `Tiempo restante: ${timeLeft}s`;
+
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                score -= 100;
+                if (timeLeft >= 0) {
+                    document.getElementById('timer').innerText = `Tiempo restante: ${timeLeft}s`;
+                    document.getElementById('points').innerText = score;
+                } else {
+                    clearInterval(timerInterval);
+                    checkAnswer();
+                }
+            }, 1000);
+        }
+
+        function checkAnswer() {
+            clearInterval(timerInterval);
+            const answer = parseInt(document.getElementById('answer').value);
+            const result = num1 * num2;
+            document.getElementById('answer').disabled = true;
+
+            if (answer === result) {
+                document.getElementById('result').innerText = '¡Correcto!';
+                correctCount++;
+            } else {
+                document.getElementById('result').innerText = `Incorrecto. La respuesta correcta es ${result}.`;
+                incorrectCount++;
+                score = 0;
+            }
+
+            document.getElementById('correct-count').innerText = correctCount;
+            document.getElementById('incorrect-count').innerText = incorrectCount;
+            document.getElementById('points').innerText = score;
+            document.getElementById('result').classList.remove('hidden');
+            questionCount++;
+
+            if (questionCount < 10) {
+                answerTimeout = setTimeout(generateQuestion, 3000);
+            } else {
+                document.getElementById('final-score').innerText = `Resultado final: ${correctCount} aciertos, ${incorrectCount} fallos. Puntuación total: ${score}`;
+                document.getElementById('final-score').classList.remove('hidden');
+            }
+        }
+
+        window.onload = generateQuestion;
+    </script>
+</body>
+</html>
